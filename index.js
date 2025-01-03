@@ -1,8 +1,9 @@
 let video = document.getElementById("webcam");
 let model; // to store the blazeface model
 let bell = new Audio('bell.mp3');
-let bellRung = false; 
+let bellRung = false; // a flag is being used to prevent the bell from ringing continuously
 
+//request access to the webcam
 const webCamera = () => {
   navigator.mediaDevices
     .getUserMedia({
@@ -10,15 +11,15 @@ const webCamera = () => {
       audio: false,
     })
     .then((stream) => {
-      video.srcObject = stream;
+      video.srcObject = stream; //display the webcam feed in the video element 
     });
 };
 
 const detectFaces = async () => {
-  const prediction = await model.estimateFaces(video, false);
+    //checks for the face in the video
+  const prediction = await model.estimateFaces(video);
 
- 
-
+//   if an array detected set the flag to true so that bell doesnot ring continuously
   if (prediction.length > 0 && !bellRung) {
     bell.play();
     bellRung = true; 
@@ -28,8 +29,10 @@ const detectFaces = async () => {
   }
 };
 
+
 webCamera();
 
+//waits for the video data to be loaded, then loads the BlazeFace model for face detection. Once the model is ready, it starts calling the detectFaces
 video.addEventListener("loadeddata", async () => {
   model = await blazeface.load();
 
