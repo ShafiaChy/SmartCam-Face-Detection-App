@@ -1,9 +1,8 @@
 let video = document.getElementById("webcam");
-let model; // to store the blazeface model
 let bell = new Audio('bell.mp3');
 let bellRung = false; // a flag is being used to prevent the bell from ringing continuously
 
-//request access to the webcam
+
 const webCamera = () => {
   navigator.mediaDevices
     .getUserMedia({
@@ -15,26 +14,52 @@ const webCamera = () => {
     });
 };
 
-const detectFaces = async () => {
-    //checks for the face in the video
-  const prediction = await model.estimateFaces(video);
-
-//   if an array detected set the flag to true so that bell doesnot ring continuously
-  if (prediction.length > 0 && !bellRung) {
-    bell.play();
-    bellRung = true; 
-    
-  } else if (prediction.length === 0) {
-    bellRung = false; 
-  }
-};
-
 
 webCamera();
 
-//waits for the video data to be loaded, then loads the BlazeFace model for face detection. Once the model is ready, it starts calling the detectFaces
 video.addEventListener("loadeddata", async () => {
-  model = await blazeface.load();
+
+const model = faceDetection.SupportedModels.MediaPipeFaceDetector; // specifies the MediaPipe Face Detector as the model to use
+
+const detectorConfig = {
+  runtime: 'mediapipe', //for using the MediaPipe library
+  solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_detection', //cdn for loading to load the necessary assets for the model
+}; 
+try {
+  const detector = await faceDetection.createDetector(model, detectorConfig);
+  
+
+  // Start detecting faces
+  const detectFaces = async () => {
+    const face = await detector.estimateFaces(video);
+
+    if (face?.length > 0 && !bellRung) {
+      bell.play();
+      bellRung = true; 
+      console.log("Faces detected:", face,bellRung)
+      const box = face[0].box;
+      
+      // Draw rectangle around the face
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 3;
+      console.log(ctx)
+    
+      ctx.strokeRect(box.xMin, box.yMin, box.width, box.height);
+      
+      
+    } else if(face.length==0){
+      bellRung = false; 
+      console.log("No faces detected",bellRung);
+      
+    }
+
+  
+  };
 
   setInterval(detectFaces, 100);
+} catch (error) {
+  console.error("Error loading detector:", error);
+}
+
 });
+
