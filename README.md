@@ -9,8 +9,13 @@ SmartCam is a simple face detection application that uses TensorFlow.js and Blaz
 To get started with SmartCam, you need to include the necessary script tags for TensorFlow.js and BlazeFace in your HTML file. Add the following tags:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    
+    <!-- You must explicitly require a TF.js backend if you're not using the TF.js union bundle. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
 ```
 
 Place these script tags above the script file containing your custom JavaScript code.
@@ -37,29 +42,30 @@ Place these script tags above the script file containing your custom JavaScript 
    };
    ```
 
-2. **Load the BlazeFace Model**
-   Once the video element is loaded with data, load the BlazeFace model:
+2. **Load the MediaPipe Model**
+   Once the video element is loaded with data, specify the MediaPipe Face Detector as the model to use:
 
    ```javascript
-   video.addEventListener("loadeddata", async () => {
-     const model = await blazeface.load();
+   const detector = await faceDetection.createDetector(model, detectorConfig);
 
-     setInterval(async () => {
-       const predictions = await model.estimateFaces(video);
-       detectFaces(predictions);
-     }, 100);
-   });
+      const detectFaces = async () => {
+        const face = await detector.estimateFaces(video);
+
+        if (face?.length > 0 && !bellRung) {
+          bell.play();
+          bellRung = true; 
+          console.log("Faces detected:", face,bellRung)
+          
+          
+        } else if(face.length==0){
+          bellRung = false; 
+          console.log("No faces detected",bellRung);
+          
+    }
+
    ```
 
-3. **Detect Faces**
-   Pass the video feed to the BlazeFace model to detect faces in real-time. The `estimateFaces` function returns an array of predictions, which you can process to highlight detected faces.
-    ```javascript
-        video.addEventListener("loadeddata", async () => {
-            model = await blazeface.load();
 
-            setInterval(detectFaces, 100);
-        });
-```
 
 
 ### Explanation
@@ -96,9 +102,11 @@ Place these script tags above the script file containing your custom JavaScript 
 </head>
 <body>
   <video id="video" autoplay playsinline width="600" height="400"></video>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
-  <script src="app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+    <script src="index.js"></script>
 </body>
 </html>
 ```

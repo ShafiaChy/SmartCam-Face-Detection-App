@@ -27,9 +27,7 @@ const detectorConfig = {
 }; 
 try {
   const detector = await faceDetection.createDetector(model, detectorConfig);
-  
 
-  // Start detecting faces
   const detectFaces = async () => {
     const face = await detector.estimateFaces(video);
 
@@ -37,14 +35,6 @@ try {
       bell.play();
       bellRung = true; 
       console.log("Faces detected:", face,bellRung)
-      const box = face[0].box;
-      
-      // Draw rectangle around the face
-      ctx.strokeStyle = "red";
-      ctx.lineWidth = 3;
-      console.log(ctx)
-    
-      ctx.strokeRect(box.xMin, box.yMin, box.width, box.height);
       
       
     } else if(face.length==0){
