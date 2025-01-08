@@ -116,7 +116,8 @@ Place these script tags above the script file containing your custom JavaScript 
 ## Notes
 
 - Ensure your browser supports `getUserMedia` to access the integrated webcam of your PC.
-
+- used mediapipe cdn https://github.com/tensorflow/tfjs-models/tree/master/face-detection/src/mediapipe
+- used tensorflow simple face detection for JavaScript https://github.com/tensorflow/tfjs-models/tree/master/face-detection
 
 ---
 
